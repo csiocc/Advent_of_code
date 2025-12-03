@@ -59,19 +59,19 @@ class PuzzleSolver
     
       current = n.to_i
 
-      if current >= second_highest[:n]
+      if current > second_highest[:n]
         second_highest[:n] = current
         second_highest[:i] = ii
       end
     end
 
-    if second_highest[:n].nil?
+    if second_highest[:i].nil?
       value.each_with_index do |n, ii|
-        next if ii <= i
+        next if ii == i
 
         current = n.to_i
         
-        if current >= second_highest[:n]
+        if current > second_highest[:n]
           second_highest[:n] = current
           second_highest[:i] = ii
         end
