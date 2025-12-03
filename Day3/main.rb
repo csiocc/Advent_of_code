@@ -21,35 +21,44 @@ class PuzzleSolver
     value.each do |line|
       @clicks += 1
       highest, second_highest = find_highest(line)
-      no = eval("#{highest}#{second_highest}")
+      p "highest: #{highest[:n]}, second highest: #{second_highest[:n]}" if DEBUG
+      no = ("#{highest[:n]}#{second_highest[:n]}").to_i if highest[:i] < second_highest[:i]
+      no = ("#{second_highest[:n]}#{highest[:n]}").to_i if highest[:i] > second_highest[:i]
       @result << no
+      p "pushing #{no} to result array"
     end
-    p "result: #{@result.sum}"
+    p "result: #{@result.sum}" 
   end
 
   def find_highest(value)
-    p "input = #{value}" 
-    highest = 0
-    second_highest = 0
+    highest = {n: 0, i: nil}
+  
+    value.each_with_index do |n, i| 
+      current = n.to_i
+      p "#{current} vs #{highest[:n]}" if DEBUG
 
-    value.each do |n| 
+      if current > highest[:n]
+        highest[:n] = current.to_i
+        highest[:i] = i
+      end
+    end
+    second_highest = find_second(value, highest[:i])
+    p "found highest: #{highest}, second highest: #{second_highest}"
+    return highest, second_highest
+  end
+
+  def find_second(value, i)
+    second_highest = {n: 0, i: 0}
+    value.each_with_index do |n, ii|
+      next if ii == i
       current = n.to_i
 
-      p "current = #{current}"
-      p "#{current} vs #{highest}" if DEBUG
-
-      if current > highest
-        highest = current.to_i
-        p "highest = #{highest}"
-        next
+      if current > second_highest[:n]
+        second_highest[:n] = current.to_i
+        second_highest[:i] = ii
       end
-      if current <= highest && current > second_highest
-        second_highest = current.to_i
-        p "second highest = #{second_highest}"
-      end  
     end
-    p "highest: #{highest}, second highest: #{second_highest}, clicks: #{@clicks}" 
-    return highest, second_highest
+    return second_highest
   end
 
 
