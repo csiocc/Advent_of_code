@@ -1,7 +1,7 @@
 require_relative '../main'
 
 RSpec.describe PuzzleSolver do
-  subject(:solver) { described_class.allocate } # skip initialize (kein File-Read)
+  subject(:solver) { described_class.allocate }
 
   describe '#equal?' do
     it 'liefert true, wenn beide hälften identisch sind' do
