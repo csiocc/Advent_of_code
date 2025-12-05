@@ -18,7 +18,7 @@ class PuzzleSolver
       start_str, end_str = range.split('-')
       start_id = start_str.to_i
       end_id = end_str.to_i
-      @ranges << (start_id..end_id).to_a
+      @ranges << (start_id..end_id)
     end
     p "ranges loaded" if DEBUG
   end
