@@ -7,7 +7,7 @@ class PuzzleSolver
   end
   DEBUG = false
   def read_input(file_path)
-    File.readlines(file_path, chomp: true).map do |line|
+    File.readlines(file_path).map do |line|
       line.chomp
     end
   end
