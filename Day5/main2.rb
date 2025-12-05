@@ -5,7 +5,6 @@ class PuzzleSolver
     @progress = 0.0
     @ranges = []
     @fresh_ids = 0
-    @running = false
     @current_id = 0
     @range = nil
   end
@@ -23,60 +22,36 @@ class PuzzleSolver
       end_id = end_str.to_i
       @ranges << (start_id..end_id)
     end
-    p "ranges loaded" if DEBUG
+    @ranges.sort_by! { |r| r.begin }
+    p "ranges loaded and sorted" if DEBUG
   end
 
   def call
     get_ranges
     get_fresh
-  end
-
-  def get_fresh
-    highest_id = @ranges.map(&:end).max
-    lowest_id = @ranges.map(&:begin).min
-    @range = (lowest_id..highest_id)
-    @current_id = lowest_id
-    @fresh_ids = 0
-    @progress = 0.0
-
-    range_length = highest_id - lowest_id
-    p "full range length: #{range_length}" if DEBUG
-    p "lowest id: #{lowest_id}" if DEBUG
-    p "highest id: #{highest_id}" if DEBUG
-    @running = true
-    display = Thread.new { print_progress }
-
-    @range.each do |id|
-      is_fresh = @ranges.any? { |r| r.cover?(id) }
-      p "is fresh: #{is_fresh} for id #{id}" if is_fresh && DEBUG2
-      @fresh_ids += 1 if is_fresh
-      @progress = (((id - lowest_id).to_f / range_length.to_f) * 100.0).round(2)
-      @current_id = id
-      end
-  ensure
-    @running = false
-    display&.join
     p @fresh_ids
   end
 
-  def get_progress(current, total)
-    current_progress = (current.to_f / total.to_f) * 100.0
-    
-    if current_progress.round(2) != @progress
-      @progress = current_progress.round(2)
-    end   
+  def get_fresh
+    range_merge = []
+
+    start = @ranges[0].begin
+    ending = @ranges[0].end
+
+    p @ranges if DEBUG
+    @ranges.drop(1).each do |range|
+      if range.begin <= ending + 1
+        ending = [ending, range.end].max
+      else
+        range_merge << (start..ending)
+        start = range.begin
+        ending = range.end
+      end
+    end
+    range_merge << (start..ending)
+    @fresh_ids = range_merge.sum { |range| range.size }
   end
 
-  def print_progress
-    while @running
-      range_string = @range ? "#{@range.begin}-#{@range.end}" : "no range"
-      print "\r\033[KChecking ID: #{@current_id} | in Range: #{range_string}"
-      print "\n\033[KFresh_ids: #{@fresh_ids} | Progress: #{@progress}%"
-      print "\033[1A"
-        STDOUT.flush
-      sleep 0.1
-    end
-  end
 end
 
 DEBUG = true
