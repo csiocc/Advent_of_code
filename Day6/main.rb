@@ -64,5 +64,4 @@ class PuzzleSolver
   end
 end
 
-DEBUG = true
 PuzzleSolver.new.call
